@@ -41,21 +41,19 @@ class TextOverlayScript(scripts.Script):
     with gradio.Group():
       with gradio.Row():
         enabled = gradio.Checkbox(label='Enable text overlay', value=opts.data.get(getOptionId('enabled'), True))
-        font_size = gradio.Slider(minimum=10, maximum=50, step=1, label='Font size', value=opts.data.get(getOptionId('font_size'), 20))
+        font_scale = gradio.Slider(minimum=10, maximum=200, step=1, label='Font scale', value=opts.data.get(getOptionId('font_scale'), 100))
       with gradio.Row():
         font_color = gradio.ColorPicker(label='Font color', value=opts.data.get(getOptionId('font_color'), '#ffffff'))
         position = gradio.Dropdown(choices=[p.name for p in Position], label='Text position', value=opts.data.get(getOptionId('position'), Position.BOTTOM_RIGHT.name))
       with gradio.Row():
         text_input = gradio.Textbox(label="Overlay Text", value=opts.data.get(getOptionId('text'), "Generation Time: {time}"))
 
-    return [enabled, font_size, font_color, position, text_input]
+    return [enabled, font_scale, font_color, position, text_input]
 
-  def process(self, processing: StableDiffusionProcessing, enabled, font_size, font_color, position, text_input):
-    logger.debug(f'process({enabled}, {font_size}, {font_color}, {position}, {text_input})')
+  def process(self, processing: StableDiffusionProcessing, enabled, font_scale, font_color, position, text_input):
+    logger.debug(f'process({enabled}, {font_scale}, {font_color}, {position}, {text_input})')
     self.enabled = enabled
-    # if font_size is 100 for a 1048576 pixels image, final calculated font_size will be 32
-    # scale accordingly
-    self.font_size = font_size
+    self.font_scale = font_scale
     self.font_color = font_color
     self.position = Position[position]
     self.text_input = text_input
@@ -64,7 +62,7 @@ class TextOverlayScript(scripts.Script):
 
     self.start_time = time.time()
 
-  def postprocess(self, processing: StableDiffusionProcessing, processed: Processed, enabled, font_size, font_color, position, text_input):
+  def postprocess(self, processing: StableDiffusionProcessing, processed: Processed, enabled, font_scale, font_color, position, text_input):
     if not self.enabled:
       return
 
@@ -76,7 +74,9 @@ class TextOverlayScript(scripts.Script):
 
     for i in range(len(processed.images)):
       img = processed.images[i]
-      img = draw_text(img, overlay_text, self.font_size, self.font_color, self.position)
+      pixels = img.width * img.height
+      font_size = int((self.font_scale / 100) * (32 * (pixels / 1048576) ** 0.5))
+      img = draw_text(img, overlay_text, font_size, self.font_color, self.position)
       processed.images[i] = img
 
     logger.info(f'Added text overlay: {overlay_text}')
@@ -85,7 +85,7 @@ class TextOverlayScript(scripts.Script):
 def on_ui_settings():
   section = ('text_overlay', "Text Overlay")
   shared.opts.add_option("text_overlay_enabled", shared.OptionInfo(True, "Enable text overlay by default", section=section))
-  shared.opts.add_option("text_overlay_font_size", shared.OptionInfo(20, "Default font size", section=section))
+  shared.opts.add_option("text_overlay_font_scale", shared.OptionInfo(100, "Default font scale", section=section))
   shared.opts.add_option("text_overlay_font_color", shared.OptionInfo("#ffffff", "Default font color", section=section))
   shared.opts.add_option("text_overlay_position", shared.OptionInfo("BOTTOM_RIGHT", "Default text position", section=section))
   shared.opts.add_option("text_overlay_text", shared.OptionInfo("Generation Time: {time}", "Default overlay text", section=section))
