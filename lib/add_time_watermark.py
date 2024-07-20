@@ -30,28 +30,28 @@ def align(bounds: Tuple[int, int], inner_box: Tuple[int, int], position: Positio
   return (x, y)
 
 def draw_text(img: Image.Image, text: str, font_size: int, font_color: str, position: Position) -> Image.Image:
-    draw = ImageDraw.Draw(img)
+  draw = ImageDraw.Draw(img)
 
-    margin = 0
-    padding = 4
-    font = ImageFont.truetype("D:/ai/automatic1111/repositories/generative-models/data/DejaVuSans.ttf", font_size)  # Use a specific font file
+  margin = 0
+  padding = 4
+  font = ImageFont.truetype("D:/ai/automatic1111/repositories/generative-models/data/DejaVuSans.ttf", font_size) # Use a specific font file
 
-    text_bbox = draw.textbbox((0, 0), text, font=font)
-    text_width = text_bbox[2] - text_bbox[0]
-    text_height = text_bbox[3] - text_bbox[1]
-    box_width = text_width + padding * 2
-    box_height = text_height + padding * 2
+  text_bbox = draw.textbbox((0, 0), text, font=font)
+  text_width = text_bbox[2] - text_bbox[0]
+  text_height = text_bbox[3] - text_bbox[1]
+  box_width = text_width + padding * 2
+  box_height = text_height + padding * 2
 
-    box_position = align(img.size, (box_width, box_height), position, margin)
-    text_position = (box_position[0] + padding, box_position[1] + padding)
+  box_position = align(img.size, (box_width, box_height), position, margin)
+  text_position = (box_position[0] + padding, box_position[1] + padding)
 
-    img = img.convert('RGBA')
-    overlay = Image.new('RGBA', img.size, (255, 255, 255, 0))
-    overlay_draw = ImageDraw.Draw(overlay)
-    overlay_draw.rectangle((box_position[0], box_position[1], box_position[0] + box_width, box_position[1] + box_height), fill=(0, 0, 0, 127))
-    img = Image.alpha_composite(img, overlay)
-    img = img.convert('RGB')
-    img_draw = ImageDraw.Draw(img)
-    img_draw.text(text_position, text, font=font, fill=font_color)
+  img = img.convert('RGBA')
+  overlay = Image.new('RGBA', img.size, (255, 255, 255, 0))
+  overlay_draw = ImageDraw.Draw(overlay)
+  overlay_draw.rectangle((box_position[0], box_position[1], box_position[0] + box_width, box_position[1] + box_height), fill=(0, 0, 0, 127))
+  img = Image.alpha_composite(img, overlay)
+  img = img.convert('RGB')
+  img_draw = ImageDraw.Draw(img)
+  img_draw.text(text_position, text, font=font, fill=font_color)
 
-    return img
+  return img
