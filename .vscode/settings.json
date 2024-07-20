@@ -1,0 +1,10 @@
+{
+  "python.defaultInterpreterPath": "D:/ai/automatic1111/venv/Scripts/python.exe",
+  "python.autoComplete.extraPaths": [
+    "D:/ai/automatic1111",
+  ],
+  "python.analysis.extraPaths": [
+    "D:/ai/automatic1111",
+  ],
+  "python.analysis.typeCheckingMode": "basic",
+}
