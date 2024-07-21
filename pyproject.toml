@@ -1,5 +1,5 @@
 [project]
-name = "invoke-node-text-util"
+name = "automatic1111-extension-custom-text-overlay"
 version = "0.0.0"
 
 [project.optional-dependencies]

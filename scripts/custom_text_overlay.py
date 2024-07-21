@@ -35,7 +35,7 @@ specialReplacements = {
   'all_negative_prompts': 'negative_prompt',
 }
 
-class TextOverlayScript(scripts.Script):
+class CustomTextOverlay(scripts.Script):
   def title(self):
     return extensionTitle
 
@@ -44,15 +44,18 @@ class TextOverlayScript(scripts.Script):
 
   def ui(self, is_img2img):
     minWidth = 200
+    templateEngine = getOption('template_engine', 'jinja2')
+    timeTemplate = '{{time}}s' if templateEngine == 'jinja2' else "{{ ('%.1f'|format(time)).rstrip('0').rstrip('.') }}s"
+    seedTemplate = 'Seed {{seed}}'
     with InputAccordion(False, label=extensionTitle, elem_id=self.elem_id(extensionId)) as enabled:
-      with gradio.Accordion('Text'):
+      with gradio.Accordion('Text', open=True):
         with gradio.Row():
           with gradio.Column(min_width=minWidth):
             textEnabled1 = gradio.Checkbox(label='Top left text', value=True)
-            textTemplate1 = gradio.Textbox(label='Top left text template', value='Time: {{time}}s', lines=1, show_label=False)
+            textTemplate1 = gradio.Textbox(label='Top left text template', value=timeTemplate, lines=1, show_label=False)
           with gradio.Column(min_width=minWidth):
             textEnabled2 = gradio.Checkbox(label='Top center text', value=True)
-            textTemplate2 = gradio.Textbox(label='Top center text template', value='', lines=1)
+            textTemplate2 = gradio.Textbox(label='Top center text template', value='', lines=1, show_label=False)
           with gradio.Column(min_width=minWidth):
             textEnabled3 = gradio.Checkbox(label='Top right text', value=True)
             textTemplate3 = gradio.Textbox(label='Top right text template', value='', lines=1, show_label=False)
@@ -62,14 +65,14 @@ class TextOverlayScript(scripts.Script):
             textTemplate4 = gradio.Textbox(label='Center left text template', value='', lines=1, show_label=False)
           with gradio.Column(min_width=minWidth):
             textEnabled5 = gradio.Checkbox(label='Center text', value=True)
-            textTemplate5 = gradio.Textbox(label='Center text template', value='Prompt: {{prompt}}', lines=1, show_label=False)
+            textTemplate5 = gradio.Textbox(label='Center text template', value='', lines=1, show_label=False)
           with gradio.Column(min_width=minWidth):
             textEnabled6 = gradio.Checkbox(label='Center right text', value=True)
             textTemplate6 = gradio.Textbox(label='Center right text template', value='', lines=1, show_label=False)
         with gradio.Row():
           with gradio.Column(min_width=minWidth):
             textEnabled7 = gradio.Checkbox(label='Bottom left text', value=True)
-            textTemplate7 = gradio.Textbox(label='Bottom left text template', value='Seed {{seed}}', lines=1, show_label=False)
+            textTemplate7 = gradio.Textbox(label='Bottom left text template', value=seedTemplate, lines=1, show_label=False)
           with gradio.Column(min_width=minWidth):
             textEnabled8 = gradio.Checkbox(label='Bottom center text', value=True)
             textTemplate8 = gradio.Textbox(label='Bottom center text template', value='', lines=1, show_label=False)
@@ -81,19 +84,19 @@ class TextOverlayScript(scripts.Script):
         with gradio.Row():
           with gradio.Column(min_width=minWidth):
             textColor = gradio.ColorPicker(label='Text color', value='#ffffff')
-            textScale = gradio.Slider(minimum=10, maximum=300, step=10, label='Text scale', value=120)
+            textScale = gradio.Slider(minimum=20, maximum=300, step=10, label='Text scale', value=120)
           with gradio.Column(min_width=minWidth):
-            paddingScale = gradio.Slider(minimum=0, maximum=200, step=1, label='Padding scale', value=40)
-            marginScale = gradio.Slider(minimum=0, maximum=200, step=1, label='Margin scale', value=0)
+            paddingScale = gradio.Slider(minimum=0, maximum=200, step=5, label='Padding scale', value=25)
+            marginScale = gradio.Slider(minimum=0, maximum=200, step=5, label='Margin scale', value=0)
         gradio.HTML('<p style="margin-top: 2em"><h2>Outline</h2><hr style="margin-top: 0; margin-bottom: 1em"/></p>')
         with gradio.Row():
-          outlineScale = gradio.Slider(minimum=0, maximum=25, step=1, label='Outline scale', value=8)
+          outlineScale = gradio.Slider(minimum=0, maximum=25, step=1, label='Outline scale', value=12)
           outlineColor = gradio.ColorPicker(label='Outline color', value='#000000')
-          outlineOpacity = gradio.Slider(minimum=0, maximum=100, step=1, label='Outline opacity', value=100)
+          outlineOpacity = gradio.Slider(minimum=0, maximum=100, step=5, label='Outline opacity', value=100)
         gradio.HTML('<p style="margin-top: 2em"><h2>Background Box</h2><hr style="margin-top: 0; margin-bottom: 1em"/></p>')
         with gradio.Row():
           backgroundColor = gradio.ColorPicker(label='Background color', value='#000000')
-          backgroundOpacity = gradio.Slider(minimum=0, maximum=100, step=1, label='Background opacity', value=0)
+          backgroundOpacity = gradio.Slider(minimum=0, maximum=100, step=5, label='Background opacity', value=0)
 
     return [
       enabled, textScale, textColor, backgroundColor, backgroundOpacity, paddingScale, marginScale, outlineScale, outlineColor, outlineOpacity, textEnabled1, textEnabled2, textEnabled3, textEnabled4, textEnabled5, textEnabled6, textEnabled7, textEnabled8, textEnabled9, textTemplate1, textTemplate2,
@@ -110,7 +113,8 @@ class TextOverlayScript(scripts.Script):
     self.startTime = time.perf_counter()
 
   def collectReplacements(self, staticReplacements: dict = {}, replacementSources: dict = {}, imageIndex: int = 0, timeSeconds: float = 0):
-    tempateEngine = getOption('template_engine', 'basic')
+    tempateEngine = getOption('template_engine', 'jinja2')
+    logger.info(tempateEngine)
     replacements = self.makeReplacementTable(staticReplacements, keysFromImg, replacementSources)
     if timeSeconds is not None:
       if tempateEngine == 'jinja2':
@@ -149,11 +153,18 @@ class TextOverlayScript(scripts.Script):
     return replacements
 
   def applyReplacements(self, templateString: str, replacements: dict):
-    templateEngine = getOption('template_engine', 'basic')
-    if templateEngine == 'jinja2':
-      jinjaTemplate = Template(templateString)
-      return jinjaTemplate.render(replacements)
-    return self.applyReplacementsBasic(templateString, replacements)
+    templateEngine = getOption('template_engine', 'jinja2')
+    templateHandler = self.applyReplacementsJinja if templateEngine == 'jinja2' else self.applyReplacementsBasic
+    inputTemplate = templateString.strip()
+    output = templateHandler(inputTemplate, replacements)
+    if inputTemplate == output:
+      return inputTemplate
+    logger.debug(f'Resolving template “{inputTemplate}” to “{output}” with engine {templateEngine} and keys {", ".join(replacements.keys())}')
+    return output
+
+  def applyReplacementsJinja(self, templateString: str, replacements: dict):
+    jinjaTemplate = Template(templateString)
+    return jinjaTemplate.render(replacements)
 
   def applyReplacementsBasic(self, templateString: str, replacements: dict):
     for key, value in replacements.items():
