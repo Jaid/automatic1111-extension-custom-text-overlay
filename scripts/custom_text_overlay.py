@@ -47,9 +47,10 @@ class CustomTextOverlay(scripts.Script):
   def ui(self, is_img2img):
     minWidth = 200
     templateEngine = getOption('template_engine')
-    timeTemplate = "{{ ('%.1f'|format(time)).rstrip('0').rstrip('.') }} sec\n{{ ('%.1f'|format(steps / time)).rstrip('0').rstrip('.') }} steps/s" if templateEngine == 'jinja2' else '{{time}}s'
-    seedTemplate = 'Seed {{seed}}'
+    useExamples = getOption('examples')
     def getTemplateInput(label: str, value: str = '') -> tuple[gradio.Checkbox, gradio.Textbox]:
+      if not useExamples:
+        value = ''
       checkbox = gradio.Checkbox(label=f'{label} text', value=True)
       textbox = gradio.Textbox(label=f'{label} text template', value=value, lines=1, show_label=False)
       return (checkbox, textbox)
@@ -57,6 +58,7 @@ class CustomTextOverlay(scripts.Script):
       with gradio.Accordion('Text', open=True):
         with gradio.Row():
           with gradio.Column(min_width=minWidth):
+            timeTemplate = "{{ ('%.1f'|format(time)).rstrip('0').rstrip('.') }} sec\n{{ ('%.1f'|format(steps / time)).rstrip('0').rstrip('.') }} steps/s" if templateEngine == 'jinja2' else '{{time}}s'
             (textEnabled1, textTemplate1) = getTemplateInput('Top left', timeTemplate)
           with gradio.Column(min_width=minWidth):
             (textEnabled2, textTemplate2) = getTemplateInput('Top')
@@ -71,6 +73,7 @@ class CustomTextOverlay(scripts.Script):
             (textEnabled6, textTemplate6) = getTemplateInput('Right')
         with gradio.Row():
           with gradio.Column(min_width=minWidth):
+            seedTemplate = 'Seed {{seed}}'
             (textEnabled7, textTemplate7) = getTemplateInput('Bottom left', seedTemplate)
           with gradio.Column(min_width=minWidth):
             (textEnabled8, textTemplate8) = getTemplateInput('Bottom')

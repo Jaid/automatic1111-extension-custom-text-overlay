@@ -5,7 +5,8 @@ from typing import Any
 import gradio
 
 defaults = {
-  'template_engine': 'basic'
+  'template_engine': 'basic',
+  'examples': True,
 }
 
 uiInfos = {
@@ -15,6 +16,10 @@ uiInfos = {
     'component_args': {
       'choices': ['basic', 'jinja2']
     }
+  },
+  'examples': {
+    'label': 'Prefill template inbut fields with examples',
+    'component': gradio.Checkbox
   }
 }
 
