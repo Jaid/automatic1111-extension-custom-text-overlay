@@ -18,7 +18,8 @@ uiInfos = {
     }
   },
   'examples': {
-    'label': 'Prefill template inbut fields with examples',
+    'label': 'Prefill template input fields with examples',
+    'comment_after': 'Alternatively, you can apply your current UI state to change the default values of the input fields.',
     'component': gradio.Checkbox
   }
 }
@@ -45,7 +46,7 @@ def onUiSettings():
       'default': defaultValue
     }
     if optionId in uiInfos:
-      uiInfo = uiInfos[optionId]
+      uiInfo.update(uiInfos[optionId])
     optionInfo = shared.OptionInfo(**uiInfo)
     optionInfo.section = section
     fullOptionId = getOptionId(optionId)
