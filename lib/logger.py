@@ -5,7 +5,7 @@ import sys
 
 from modules import shared
 
-from lib.extension import extensionId, extensionTitle
+from src.extension import extensionId, extensionTitle
 
 COLORS = {
   'DEBUG': '\033[0;36m', # CYAN

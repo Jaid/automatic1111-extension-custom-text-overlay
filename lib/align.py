@@ -27,3 +27,10 @@ def align(bounds: Tuple[int, int], inner_box: Tuple[int, int], position: Positio
   else:
     x = (bounds[0] - inner_box[0]) // 2
   return (x, y)
+
+def getTextAlignFromPosition(position: Position) -> str:
+  if position in (Position.TOP_RIGHT, Position.CENTER_RIGHT, Position.BOTTOM_RIGHT):
+    return 'right'
+  if position in (Position.TOP_CENTER, Position.CENTER, Position.BOTTOM_CENTER):
+    return 'center'
+  return 'left'

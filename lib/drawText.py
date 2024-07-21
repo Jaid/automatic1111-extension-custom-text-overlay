@@ -1,16 +1,12 @@
 from PIL import Image, ImageDraw, ImageFont, ImageColor
-from lib.align import align, Position
+from lib.align import align, Position, getTextAlignFromPosition
 from lib.logger import logger
 from lib.util import percentToByte
 
 def drawText(img: Image.Image, text: str, fontSize: int, textColor: str, position: Position, backgroundColor: str, backgroundOpacity: int, margin: int = 0, padding: int = 8, outline: int = 0, outlineColor: str = '#000000', outlineOpacity: int = 100) -> Image.Image:
   draw = ImageDraw.Draw(img)
   font = ImageFont.truetype("D:/ai/automatic1111/modules/Roboto-Regular.ttf", fontSize)
-  multilineAlign = 'left'
-  if position == 4 or position == 5 or position == 6:
-    multilineAlign = 'center'
-  elif position == 7 or position == 8 or position == 9:
-    multilineAlign = 'right'
+  multilineAlign = getTextAlignFromPosition(position)
   drawTextArgs = {
     'text': text,
     'font': font,
