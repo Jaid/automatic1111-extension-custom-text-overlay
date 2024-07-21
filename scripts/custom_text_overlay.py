@@ -27,6 +27,7 @@ keysFromImg = [
   'subseed',
   'prompt',
   'negative_prompt',
+  'steps'
 ]
 
 specialReplacements = {
@@ -46,7 +47,7 @@ class CustomTextOverlay(scripts.Script):
   def ui(self, is_img2img):
     minWidth = 200
     templateEngine = getOption('template_engine')
-    timeTemplate = "{{ ('%.1f'|format(time)).rstrip('0').rstrip('.') }}s" if templateEngine == 'jinja2' else '{{time}}s'
+    timeTemplate = "{{ ('%.1f'|format(time)).rstrip('0').rstrip('.') }} sec\n{{ ('%.1f'|format(steps / time)).rstrip('0').rstrip('.') }} steps/s" if templateEngine == 'jinja2' else '{{time}}s'
     seedTemplate = 'Seed {{seed}}'
     def getTemplateInput(label: str, value: str = '') -> tuple[gradio.Checkbox, gradio.Textbox]:
       checkbox = gradio.Checkbox(label=f'{label} text', value=True)
