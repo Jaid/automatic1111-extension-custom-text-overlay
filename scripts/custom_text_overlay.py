@@ -44,8 +44,8 @@ class CustomTextOverlay(scripts.Script):
 
   def ui(self, is_img2img):
     minWidth = 200
-    templateEngine = getOption('template_engine', 'jinja2')
-    timeTemplate = '{{time}}s' if templateEngine == 'jinja2' else "{{ ('%.1f'|format(time)).rstrip('0').rstrip('.') }}s"
+    templateEngine = getOption('template_engine')
+    timeTemplate = "{{ ('%.1f'|format(time)).rstrip('0').rstrip('.') }}s" if templateEngine == 'jinja2' else '{{time}}s'
     seedTemplate = 'Seed {{seed}}'
     with InputAccordion(False, label=extensionTitle, elem_id=self.elem_id(extensionId)) as enabled:
       with gradio.Accordion('Text', open=True):
@@ -113,7 +113,7 @@ class CustomTextOverlay(scripts.Script):
     self.startTime = time.perf_counter()
 
   def collectReplacements(self, staticReplacements: dict = {}, replacementSources: dict = {}, imageIndex: int = 0, timeSeconds: float = 0):
-    tempateEngine = getOption('template_engine', 'jinja2')
+    tempateEngine = getOption('template_engine')
     logger.info(tempateEngine)
     replacements = self.makeReplacementTable(staticReplacements, keysFromImg, replacementSources)
     if timeSeconds is not None:
@@ -153,7 +153,7 @@ class CustomTextOverlay(scripts.Script):
     return replacements
 
   def applyReplacements(self, templateString: str, replacements: dict):
-    templateEngine = getOption('template_engine', 'jinja2')
+    templateEngine = getOption('template_engine')
     templateHandler = self.applyReplacementsJinja if templateEngine == 'jinja2' else self.applyReplacementsBasic
     inputTemplate = templateString.strip()
     output = templateHandler(inputTemplate, replacements)

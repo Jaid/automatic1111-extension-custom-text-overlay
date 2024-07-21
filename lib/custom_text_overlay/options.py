@@ -4,8 +4,18 @@ from src.custom_text_overlay.extension import extensionId, extensionTitle
 from typing import Any
 import gradio
 
-optionDefinitions = {
-  'template_engine': shared.OptionInfo('jinja2', 'Template engine to use for overlay texts', component=gradio.Dropdown, component_args={'choices': ['jinja2', 'basic']})
+defaults = {
+  'template_engine': 'basic'
+}
+
+uiInfos = {
+  'template_engine': {
+    'label': 'Template engine to use for overlay texts',
+    'component': gradio.Dropdown,
+    'component_args': {
+      'choices': ['basic', 'jinja2']
+    }
+  }
 }
 
 def getOptionId(suffix: (str | None) = None) -> str:
@@ -14,16 +24,24 @@ def getOptionId(suffix: (str | None) = None) -> str:
     return f'{prefix}_{suffix}'
   return prefix
 
-def getOption(optionId: str, defaultValue: Any) -> (Any):
+def getOption(optionId: str, defaultValue: Any = None) -> (Any):
+  if optionId in defaults:
+    defaultValue = defaults[optionId]
   fullOptionId = getOptionId(optionId)
   if not hasattr(shared.opts, fullOptionId):
     return defaultValue
-  value = getattr(shared.opts, fullOptionId, defaultValue)
+  value = getattr(shared.opts, fullOptionId)
   return value
 
 def onUiSettings():
   section = (extensionId, extensionTitle)
-  for optionId, optionInfo in optionDefinitions.items():
+  for optionId, defaultValue in defaults.items():
+    uiInfo: dict[str, Any] = {
+      'default': defaultValue
+    }
+    if optionId in uiInfos:
+      uiInfo = uiInfos[optionId]
+    optionInfo = shared.OptionInfo(**uiInfo)
     optionInfo.section = section
     fullOptionId = getOptionId(optionId)
     shared.opts.add_option(fullOptionId, optionInfo)
