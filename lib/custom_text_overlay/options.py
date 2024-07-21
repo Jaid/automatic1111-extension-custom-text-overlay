@@ -1,4 +1,4 @@
-from lib.logger import logger
+from lib.custom_text_overlay.logger import logger
 from modules import shared
 from src.custom_text_overlay.extension import extensionId, extensionTitle
 from typing import Any

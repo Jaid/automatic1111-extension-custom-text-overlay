@@ -1,7 +1,7 @@
 from PIL import Image, ImageDraw, ImageFont, ImageColor
-from lib.align import align, Position, getTextAlignFromPosition
-from lib.logger import logger
-from lib.util import percentToByte
+from lib.custom_text_overlay.align import align, Position, getTextAlignFromPosition
+from lib.custom_text_overlay.logger import logger
+from lib.custom_text_overlay.util import percentToByte
 
 def drawText(img: Image.Image, text: str, fontSize: int, textColor: str, position: Position, backgroundColor: str, backgroundOpacity: int, margin: int = 0, padding: int = 8, outline: int = 0, outlineColor: str = '#000000', outlineOpacity: int = 100) -> Image.Image:
   draw = ImageDraw.Draw(img)

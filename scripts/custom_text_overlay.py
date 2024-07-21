@@ -6,10 +6,10 @@ from modules import script_callbacks, scripts
 from modules.processing import Processed, StableDiffusionProcessing
 from modules.ui_components import InputAccordion
 
-from lib.align import Position
-from lib.drawText import drawText
-from lib.logger import logger
-from lib.options import getOption, onUiSettings
+from lib.custom_text_overlay.align import Position
+from lib.custom_text_overlay.drawText import drawText
+from lib.custom_text_overlay.logger import logger
+from lib.custom_text_overlay.options import getOption, onUiSettings
 from src.custom_text_overlay.extension import extensionId, extensionTitle
 
 templateBracketLeft = '{{'
