@@ -48,11 +48,11 @@ class CustomTextOverlay(scripts.Script):
     minWidth = 200
     templateEngine = getOption('template_engine')
     useExamples = getOption('examples')
-    def getTemplateInput(label: str, value: str = '') -> tuple[gradio.Checkbox, gradio.Textbox]:
+    def getTemplateInput(positionLabel: str, defaultValue: str = '') -> tuple[gradio.Checkbox, gradio.Textbox]:
       if not useExamples:
-        value = ''
-      checkbox = gradio.Checkbox(label=f'{label} text', value=True)
-      textbox = gradio.Textbox(label=f'{label} text template', value=value, lines=1, show_label=False)
+        defaultValue = ''
+      checkbox = gradio.Checkbox(label=f'{positionLabel} text', value=True)
+      textbox = gradio.Textbox(label=f'{positionLabel} text template', value=defaultValue, lines=1, show_label=False)
       return (checkbox, textbox)
     with InputAccordion(False, label=extensionTitle, elem_id=self.elem_id(extensionId)) as enabled:
       with gradio.Accordion('Text', open=True):
@@ -99,14 +99,11 @@ class CustomTextOverlay(scripts.Script):
           backgroundOpacity = gradio.Slider(minimum=0, maximum=100, step=5, label='Background opacity', value=0)
 
     return [
-      enabled, textScale, textColor, backgroundColor, backgroundOpacity, paddingScale, marginScale, outlineScale, outlineColor, outlineOpacity, textEnabled1, textEnabled2, textEnabled3, textEnabled4, textEnabled5, textEnabled6, textEnabled7, textEnabled8, textEnabled9, textTemplate1, textTemplate2,
-      textTemplate3, textTemplate4, textTemplate5, textTemplate6, textTemplate7, textTemplate8, textTemplate9
+      enabled, textScale, textColor, backgroundColor, backgroundOpacity, paddingScale, marginScale, outlineScale, outlineColor, outlineOpacity, textEnabled1, textEnabled2, textEnabled3, textEnabled4, textEnabled5, textEnabled6, textEnabled7, textEnabled8, textEnabled9, textTemplate1, textTemplate2, textTemplate3, textTemplate4, textTemplate5, textTemplate6, textTemplate7, textTemplate8, textTemplate9
     ]
 
   def process(
-    self, processing: StableDiffusionProcessing, enabled: bool, textScale: int, textColor: str, backgroundColor: str, backgroundOpacity: int, paddingScale: int, marginScale: int, outlineScale: int, outlineColor: str, outlineOpacity: int, textEnabled1: bool, textEnabled2: bool, textEnabled3: bool,
-    textEnabled4: bool, textEnabled5: bool, textEnabled6: bool, textEnabled7: bool, textEnabled8: bool, textEnabled9: bool, textTemplate1: str, textTemplate2: str, textTemplate3: str, textTemplate4: str, textTemplate5: str, textTemplate6: str, textTemplate7: str, textTemplate8: str,
-    textTemplate9: str
+    self, processing: StableDiffusionProcessing, enabled: bool, textScale: int, textColor: str, backgroundColor: str, backgroundOpacity: int, paddingScale: int, marginScale: int, outlineScale: int, outlineColor: str, outlineOpacity: int, textEnabled1: bool, textEnabled2: bool, textEnabled3: bool, textEnabled4: bool, textEnabled5: bool, textEnabled6: bool, textEnabled7: bool, textEnabled8: bool, textEnabled9: bool, textTemplate1: str, textTemplate2: str, textTemplate3: str, textTemplate4: str, textTemplate5: str, textTemplate6: str, textTemplate7: str, textTemplate8: str, textTemplate9: str
   ):
     if not enabled:
       return
@@ -170,6 +167,8 @@ class CustomTextOverlay(scripts.Script):
     for key, value in replacements.items():
       if isinstance(value, int) or isinstance(value, float):
         value = str(value)
+      if isinstance(value, list):
+        value = ', '.join(value)
       if not isinstance(value, str):
         continue
       templateString = templateString.replace(f'{templateBracketLeft}{key}{templateBracketRight}', value)
@@ -206,9 +205,7 @@ class CustomTextOverlay(scripts.Script):
       processed.image = drawText(processed.image, text=text, fontSize=fontSize, textColor=textColor, position=position, backgroundColor=backgroundColor, backgroundOpacity=backgroundOpacity, margin=margin, padding=padding, outline=outline, outlineColor=outlineColor, outlineOpacity=outlineOpacity)
 
   def postprocess(
-    self, processing: StableDiffusionProcessing, processed: Processed, enabled: bool, textScale: int, textColor: str, backgroundColor: str, backgroundOpacity: int, paddingScale: int, marginScale: int, outlineScale: int, outlineColor: str, outlineOpacity: int, textEnabled1: bool, textEnabled2: bool,
-    textEnabled3: bool, textEnabled4: bool, textEnabled5: bool, textEnabled6: bool, textEnabled7: bool, textEnabled8: bool, textEnabled9: bool, textTemplate1: str, textTemplate2: str, textTemplate3: str, textTemplate4: str, textTemplate5: str, textTemplate6: str, textTemplate7: str,
-    textTemplate8: str, textTemplate9: str
+    self, processing: StableDiffusionProcessing, processed: Processed, enabled: bool, textScale: int, textColor: str, backgroundColor: str, backgroundOpacity: int, paddingScale: int, marginScale: int, outlineScale: int, outlineColor: str, outlineOpacity: int, textEnabled1: bool, textEnabled2: bool, textEnabled3: bool, textEnabled4: bool, textEnabled5: bool, textEnabled6: bool, textEnabled7: bool, textEnabled8: bool, textEnabled9: bool, textTemplate1: str, textTemplate2: str, textTemplate3: str, textTemplate4: str, textTemplate5: str, textTemplate6: str, textTemplate7: str, textTemplate8: str, textTemplate9: str
   ):
     if not enabled or hookType != 'postprocess':
       return

@@ -4,8 +4,10 @@ from src.custom_text_overlay.extension import extensionId, extensionTitle
 from typing import Any
 import gradio
 
+templateEngines = ['basic', 'jinja2']
+
 defaults = {
-  'template_engine': 'basic',
+  'template_engine': templateEngines[0],
   'examples': True,
 }
 
@@ -14,12 +16,12 @@ uiInfos = {
     'label': 'Template engine to use for overlay texts',
     'component': gradio.Dropdown,
     'component_args': {
-      'choices': ['basic', 'jinja2']
+      'choices': templateEngines
     }
   },
   'examples': {
     'label': 'Prefill template input fields with examples',
-    'comment_after': 'Alternatively, you can apply your current UI state to change the default values of the input fields.',
+    'comment_after': '<div>Alternatively, you can apply your current UI state to change the default values of the input fields.</div>',
     'component': gradio.Checkbox
   }
 }
