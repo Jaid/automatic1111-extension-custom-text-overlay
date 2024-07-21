@@ -10,7 +10,7 @@ from lib.align import Position
 from lib.drawText import drawText
 from lib.logger import logger
 from lib.options import getOption, onUiSettings
-from src.extension import extensionId, extensionTitle
+from src.custom_text_overlay.extension import extensionId, extensionTitle
 
 templateBracketLeft = '{{'
 templateBracketRight = '}}'
