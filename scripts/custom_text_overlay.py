@@ -1,4 +1,5 @@
 import time
+from typing import Union
 
 import gradio
 from jinja2 import Template
@@ -47,38 +48,33 @@ class CustomTextOverlay(scripts.Script):
     templateEngine = getOption('template_engine')
     timeTemplate = "{{ ('%.1f'|format(time)).rstrip('0').rstrip('.') }}s" if templateEngine == 'jinja2' else '{{time}}s'
     seedTemplate = 'Seed {{seed}}'
+    def getTemplateInput(label: str, value: str = '') -> tuple[gradio.Checkbox, gradio.Textbox]:
+      checkbox = gradio.Checkbox(label=f'{label} text', value=True)
+      textbox = gradio.Textbox(label=f'{label} text template', value=value, lines=1, show_label=False)
+      return (checkbox, textbox)
     with InputAccordion(False, label=extensionTitle, elem_id=self.elem_id(extensionId)) as enabled:
       with gradio.Accordion('Text', open=True):
         with gradio.Row():
           with gradio.Column(min_width=minWidth):
-            textEnabled1 = gradio.Checkbox(label='Top left text', value=True)
-            textTemplate1 = gradio.Textbox(label='Top left text template', value=timeTemplate, lines=1, show_label=False)
+            (textEnabled1, textTemplate1) = getTemplateInput('Top left', timeTemplate)
           with gradio.Column(min_width=minWidth):
-            textEnabled2 = gradio.Checkbox(label='Top center text', value=True)
-            textTemplate2 = gradio.Textbox(label='Top center text template', value='', lines=1, show_label=False)
+            (textEnabled2, textTemplate2) = getTemplateInput('Top')
           with gradio.Column(min_width=minWidth):
-            textEnabled3 = gradio.Checkbox(label='Top right text', value=True)
-            textTemplate3 = gradio.Textbox(label='Top right text template', value='', lines=1, show_label=False)
+            (textEnabled3, textTemplate3) = getTemplateInput('Top right')
         with gradio.Row():
           with gradio.Column(min_width=minWidth):
-            textEnabled4 = gradio.Checkbox(label='Center left text', value=True)
-            textTemplate4 = gradio.Textbox(label='Center left text template', value='', lines=1, show_label=False)
+            (textEnabled4, textTemplate4) = getTemplateInput('Left')
           with gradio.Column(min_width=minWidth):
-            textEnabled5 = gradio.Checkbox(label='Center text', value=True)
-            textTemplate5 = gradio.Textbox(label='Center text template', value='', lines=1, show_label=False)
+            (textEnabled5, textTemplate5) = getTemplateInput('Center')
           with gradio.Column(min_width=minWidth):
-            textEnabled6 = gradio.Checkbox(label='Center right text', value=True)
-            textTemplate6 = gradio.Textbox(label='Center right text template', value='', lines=1, show_label=False)
+            (textEnabled6, textTemplate6) = getTemplateInput('Right')
         with gradio.Row():
           with gradio.Column(min_width=minWidth):
-            textEnabled7 = gradio.Checkbox(label='Bottom left text', value=True)
-            textTemplate7 = gradio.Textbox(label='Bottom left text template', value=seedTemplate, lines=1, show_label=False)
+            (textEnabled7, textTemplate7) = getTemplateInput('Bottom left', seedTemplate)
           with gradio.Column(min_width=minWidth):
-            textEnabled8 = gradio.Checkbox(label='Bottom center text', value=True)
-            textTemplate8 = gradio.Textbox(label='Bottom center text template', value='', lines=1, show_label=False)
+            (textEnabled8, textTemplate8) = getTemplateInput('Bottom')
           with gradio.Column(min_width=minWidth):
-            textEnabled9 = gradio.Checkbox(label='Bottom right text', value=True)
-            textTemplate9 = gradio.Textbox(label='Bottom right text template', value='', lines=1, show_label=False)
+            (textEnabled9, textTemplate9) = getTemplateInput('Bottom right')
       with gradio.Accordion('Style'):
         gradio.HTML('<p><h2>General</h2><hr style="margin-top: 0; margin-bottom: 1em"/></p>')
         with gradio.Row():
